@@ -1,6 +1,6 @@
 package app.dtos;
 
-import app.entities.Library;
+import app.entities.Book;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import app.security.entities.User;
 import dk.bugelhartmann.UserDTO;
@@ -14,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LibraryDTO {
+public class BookDTO {
     private Integer id;
     private String title;
     private String author;
@@ -22,14 +22,14 @@ public class LibraryDTO {
     private boolean isAvailable;
     private UserDTO user = null;
 
-    public LibraryDTO(Library library) {
-        this.id = library.getId();
-        this.title = library.getTitle();
-        this.author = library.getAuthor();
-        this.genre = library.getGenre();
-        this.isAvailable = library.isAvailable();
-        if (library.getUser() != null) {
-            User userEntity = library.getUser();
+    public BookDTO(Book book) {
+        this.id = book.getId();
+        this.title = book.getTitle();
+        this.author = book.getAuthor();
+        this.genre = book.getGenre();
+        this.isAvailable = book.isAvailable();
+        if (book.getUser() != null) {
+            User userEntity = book.getUser();
             this.user = new UserDTO(userEntity.getUsername(), userEntity.getRolesAsStrings());
         }
     }

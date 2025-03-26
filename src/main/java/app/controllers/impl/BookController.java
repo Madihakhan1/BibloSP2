@@ -2,8 +2,8 @@ package app.controllers.impl;
 
 import app.config.HibernateConfig;
 import app.controllers.IController;
-import app.daos.impl.LibraryDAO;
-import app.dtos.LibraryDTO;
+import app.daos.impl.BookDAO;
+import app.dtos.BookDTO;
 import app.exceptions.ApiException;
 import dk.bugelhartmann.UserDTO;
 import io.javalin.http.Context;
@@ -12,21 +12,21 @@ import jakarta.persistence.PersistenceException;
 
 import java.util.List;
 
-public class LibraryController implements IController<LibraryDTO, Integer> {
-    private final LibraryDAO dao;
+public class BookController implements IController<BookDTO, Integer> {
+    private final BookDAO dao;
 
-    public LibraryController() {
+    public BookController() {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
-        this.dao = LibraryDAO.getInstance(emf);
+        this.dao = BookDAO.getInstance(emf);
     }
 
     @Override
     public void read(Context ctx) throws ApiException {
         try {
             int id = Integer.parseInt(ctx.pathParam("id"));
-            LibraryDTO libraryDTO = dao.read(id);
+            BookDTO bookDTO = dao.read(id);
             ctx.res().setStatus(200);
-            ctx.json(libraryDTO, LibraryDTO.class);
+            ctx.json(bookDTO, BookDTO.class);
         } catch (NumberFormatException e) {
             throw new ApiException(400, "Missing or invalid ID parameter");
         }
@@ -34,36 +34,36 @@ public class LibraryController implements IController<LibraryDTO, Integer> {
 
     @Override
     public void readAll(Context ctx) throws ApiException {
-        List<LibraryDTO> libraryDTOS = dao.readAll();
+        List<BookDTO> bookDTOS = dao.readAll();
         ctx.res().setStatus(200);
-        ctx.json(libraryDTOS, LibraryDTO.class);
+        ctx.json(bookDTOS, BookDTO.class);
     }
 
     public void readAllFromUser(Context ctx) throws ApiException {
         UserDTO user = ctx.attribute("user");
-        List<LibraryDTO> libraryDTOS = dao.readAllFromUser(user);
+        List<BookDTO> bookDTOS = dao.readAllFromUser(user);
         ctx.res().setStatus(200);
-        ctx.json(libraryDTOS, LibraryDTO.class);
+        ctx.json(bookDTOS, BookDTO.class);
     }
 
     @Override
     public void create(Context ctx) throws ApiException {
-        LibraryDTO libraryDTO = ctx.bodyAsClass(LibraryDTO.class);
+        BookDTO bookDTO = ctx.bodyAsClass(BookDTO.class);
         UserDTO user = ctx.attribute("user");
-        libraryDTO.setUser(user);
-        libraryDTO = dao.create(libraryDTO);
+        bookDTO.setUser(user);
+        bookDTO = dao.create(bookDTO);
         ctx.res().setStatus(201);
-        ctx.json(libraryDTO, LibraryDTO.class);
+        ctx.json(bookDTO, BookDTO.class);
     }
 
     @Override
     public void update(Context ctx) throws ApiException {
         try {
             int id = Integer.parseInt(ctx.pathParam("id"));
-            LibraryDTO updatedDTO = ctx.bodyAsClass(LibraryDTO.class);
-            LibraryDTO resultDTO = dao.update(id, updatedDTO);
+            BookDTO updatedDTO = ctx.bodyAsClass(BookDTO.class);
+            BookDTO resultDTO = dao.update(id, updatedDTO);
             ctx.res().setStatus(200);
-            ctx.json(resultDTO, LibraryDTO.class);
+            ctx.json(resultDTO, BookDTO.class);
         } catch (NumberFormatException e) {
             throw new ApiException(400, "Missing or invalid ID parameter");
         }
@@ -83,7 +83,7 @@ public class LibraryController implements IController<LibraryDTO, Integer> {
 
     public void populate(Context ctx) throws ApiException {
         try {
-            LibraryDTO[] libraryDTOS = dao.populate();
+            BookDTO[] bookDTOS = dao.populate();
             ctx.res().setStatus(200);
             ctx.json("{ \"message\": \"Database has been populated with books\" }");
         } catch (PersistenceException e) {
