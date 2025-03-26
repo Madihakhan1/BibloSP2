@@ -1,6 +1,6 @@
 package app.security.controllers;
 
-import dat.security.exceptions.NotAuthorizedException;
+import app.security.exceptions.NotAuthorizedException;
 import io.javalin.http.Context;
 
 public interface IAccessController {

@@ -1,7 +1,7 @@
 package app.security.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import dat.entities.Todo;
+import app.entities.Book;
 import dk.bugelhartmann.UserDTO;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,10 +12,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Purpose: To handle security in the API
- * Author: Thomas Hartmann
- */
 @Entity
 @Table(name = "users")
 @NamedQueries(@NamedQuery(name = "User.deleteAllRows", query = "DELETE from User"))
@@ -33,25 +29,25 @@ public class User implements Serializable, ISecurityUser {
     @Basic(optional = false)
     @Column(name = "username", length = 25)
     private String username;
+
     @Basic(optional = false)
     @Column(name = "password")
     private String password;
 
-    @JoinTable(name = "user_roles", joinColumns = {@JoinColumn(name = "user_name", referencedColumnName = "username")}, inverseJoinColumns = {@JoinColumn(name = "role_name", referencedColumnName = "name")})
+    @JoinTable(name = "user_roles",
+            joinColumns = {@JoinColumn(name = "user_name", referencedColumnName = "username")},
+            inverseJoinColumns = {@JoinColumn(name = "role_name", referencedColumnName = "name")})
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Todo> todos = new HashSet<>();
+    private Set<Book> books = new HashSet<>();
 
     public Set<String> getRolesAsStrings() {
-        if (roles.isEmpty()) {
-            return null;
-        }
+        if (roles.isEmpty()) return null;
+
         Set<String> rolesAsStrings = new HashSet<>();
-        roles.forEach((role) -> {
-            rolesAsStrings.add(role.getRoleName());
-        });
+        roles.forEach(role -> rolesAsStrings.add(role.getRoleName()));
         return rolesAsStrings;
     }
 
@@ -70,11 +66,10 @@ public class User implements Serializable, ISecurityUser {
     }
 
     public void addRole(Role role) {
-        if (role == null) {
-            return;
+        if (role != null) {
+            roles.add(role);
+            role.getUsers().add(this);
         }
-        roles.add(role);
-        role.getUsers().add(this);
     }
 
     public void removeRole(String userRole) {
@@ -87,26 +82,22 @@ public class User implements Serializable, ISecurityUser {
                 });
     }
 
-    public void addTodoToUser(Todo todo) {
-        if (todo == null) {
-            return;
+    public void addBook(Book book) {
+        if (book != null) {
+            books.add(book);
+            book.setUser(this);
         }
-        todos.add(todo);
-        todo.setUser(this);
     }
 
-    public void removeTodoFromUser(Todo todo) {
-        if (todo == null) {
-            return;
+    public void removeBook(Book book) {
+        if (book != null) {
+            books.remove(book);
+            book.setUser(null);
         }
-        todos.remove(todo);
-        todo.setUser(null);
     }
 
-    public User (UserDTO userDTO) {
+    public User(UserDTO userDTO) {
         this.username = userDTO.getUsername();
         this.password = userDTO.getPassword();
-        }
-
+    }
 }
-

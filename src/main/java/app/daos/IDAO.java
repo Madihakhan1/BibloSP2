@@ -1,14 +1,12 @@
 package app.daos;
 
-import dat.exceptions.ApiException;
-
+import app.exceptions.ApiException; // ✅ BRUG DENNE!
 import java.util.List;
 
-public interface IDAO<T, I> {
-
-    T read(I i) throws ApiException;
+public interface IDAO<T, ID> {
+    T read(ID id) throws ApiException;
     List<T> readAll() throws ApiException;
-    T create(T t) throws ApiException;
-    T update(I i, T t) throws ApiException;
-    //void delete(I i) throws ApiException;
+    T create(T dto) throws ApiException;
+    T update(ID id, T dto) throws ApiException;
+    void delete(ID id, dk.bugelhartmann.UserDTO user) throws ApiException;
 }

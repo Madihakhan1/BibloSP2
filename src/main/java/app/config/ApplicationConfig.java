@@ -1,14 +1,14 @@
 package app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dat.exceptions.ApiException;
-import dat.routes.Routes;
-import dat.security.controllers.AccessController;
-import dat.security.controllers.SecurityController;
-import dat.security.enums.Role;
-import dat.security.exceptions.NotAuthorizedException;
-import dat.security.routes.SecurityRoutes;
-import dat.utils.Utils;
+import app .exceptions.ApiException;
+import app.routes.Routes;
+import app.security.controllers.AccessController;
+import app.security.controllers.SecurityController;
+import app.security.enums.Role;
+import app.security.exceptions.NotAuthorizedException;
+import app.security.routes.SecurityRoutes;
+import app.utils.Utils;
 import io.javalin.Javalin;
 import io.javalin.config.JavalinConfig;
 import io.javalin.http.Context;
@@ -44,7 +44,7 @@ public class ApplicationConfig {
         app.options("/*", ApplicationConfig::corsHeadersOptions);
 
         app.exception(ApiException.class, ApplicationConfig::apiExceptionHandler);
-        app.exception(dat.security.exceptions.ApiException.class, ApplicationConfig::apiSecurityExceptionHandler);
+        app.exception(app.security.exceptions.ApiException.class, ApplicationConfig::apiSecurityExceptionHandler);
         app.exception(NotAuthorizedException.class, ApplicationConfig::apiNotAuthorizedExceptionHandler);
         app.exception(Exception.class, ApplicationConfig::generalExceptionHandler);
 
@@ -67,7 +67,7 @@ public class ApplicationConfig {
         ctx.json(Utils.convertToJsonMessage(ctx, "warning", e.getMessage()));
     }
 
-    public static void apiSecurityExceptionHandler(dat.security.exceptions.ApiException e, Context ctx) {
+    public static void apiSecurityExceptionHandler(app.security.exceptions.ApiException e, Context ctx) {
         ctx.status(e.getCode());
         logger.warn("A Security API exception occurred: Code: {}, Message: {}", e.getCode(), e.getMessage());
         ctx.json(Utils.convertToJsonMessage(ctx, "warning", e.getMessage()));

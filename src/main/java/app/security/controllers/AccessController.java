@@ -1,7 +1,7 @@
 package app.security.controllers;
 
-import dat.security.enums.Role;
-import dat.security.exceptions.NotAuthorizedException;
+import app.security.enums.Role;
+import app.security.exceptions.NotAuthorizedException;
 import dk.bugelhartmann.UserDTO;
 import io.javalin.http.Context;
 import io.javalin.http.UnauthorizedResponse;
