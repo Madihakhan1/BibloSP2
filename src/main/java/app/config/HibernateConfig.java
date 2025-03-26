@@ -1,9 +1,9 @@
 package app.config;
 
-import dat.entities.Todo;
-import dat.security.entities.Role;
-import dat.security.entities.User;
-import dat.utils.Utils;
+import app.entities.Book;
+import app.security.entities.Role;
+import app.security.entities.User;
+import app.utils.Utils;
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -44,7 +44,7 @@ public class HibernateConfig {
     private static void getAnnotationConfiguration(Configuration configuration) {
         configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Role.class);
-        configuration.addAnnotatedClass(Todo.class);
+        configuration.addAnnotatedClass(Book.class);
     }
 
     private static EntityManagerFactory createEMF(boolean forTest) {

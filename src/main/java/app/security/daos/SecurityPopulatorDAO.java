@@ -1,8 +1,8 @@
 package app.security.daos;
 
-import dat.config.HibernateConfig;
-import dat.security.entities.Role;
-import dat.security.entities.User;
+import app.config.HibernateConfig;
+import app.security.entities.Role;
+import app.security.entities.User;
 import dk.bugelhartmann.UserDTO;
 import jakarta.persistence.EntityManagerFactory;
 

@@ -1,6 +1,6 @@
 package app.security.exceptions;
 
-import dat.utils.Utils;
+import app.utils.Utils;
 
 /**
  * Purpose: To handle exceptions in the API

@@ -1,0 +1,121 @@
+GET {{url}}/auth/test/
+
+###
+
+### Register ny bruger
+POST {{url}}/auth/register/
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "test123"
+}
+
+###
+
+### Login bruger
+POST {{url}}/auth/login/
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "test123"
+}
+
+> {%
+    client.global.set("jwt_token", response.body.token);
+    console.log("JWT Token:", client.global.get("jwt_token"));
+%}
+
+###
+
+### Protected USER route
+GET {{url}}/protected/user_demo/
+Authorization: Bearer {{jwt_token}}
+
+###
+
+### Protected ADMIN route
+GET {{url}}/protected/admin_demo/
+Authorization: Bearer {{jwt_token}}
+
+###
+
+### Giv bruger ADMIN rolle
+POST {{url}}/auth/user/addrole/
+Content-Type: application/json
+Authorization: Bearer {{jwt_token}}
+
+{
+  "role": "admin"
+}
+
+###
+
+### Populate database med eksempel-bøger (ADMIN only)
+POST {{url}}/books/populate
+Authorization: Bearer {{jwt_token}}
+
+###
+
+### Hent alle bøger
+GET {{url}}/books/
+Authorization: Bearer {{jwt_token}}
+
+###
+
+### Hent alle bøger fra den nuværende bruger
+GET {{url}}/books/mine
+Authorization: Bearer {{jwt_token}}
+
+###
+
+### Hent specifik bog via ID
+GET {{url}}/books/1
+Authorization: Bearer {{jwt_token}}
+
+###
+
+### Opret ny bog (ADMIN only)
+POST {{url}}/books/
+Content-Type: application/json
+Authorization: Bearer {{jwt_token}}
+
+{
+  "title": "New Book",
+  "author": "Jane Doe",
+  "genre": "Mystery",
+  "isAvailable": true
+}
+
+###
+
+### Opdater en bog (ADMIN only)
+PUT {{url}}/books/1
+Content-Type: application/json
+Authorization: Bearer {{jwt_token}}
+
+{
+  "title": "Updated Book",
+  "author": "Jane Doe",
+  "genre": "Updated Genre",
+  "isAvailable": true
+}
+
+###
+
+### Slet en bog (ADMIN only)
+DELETE {{url}}/books/1
+Authorization: Bearer {{jwt_token}}
+
+###
+
+### Lån en bog (USER only)
+PUT {{url}}/books/borrow/1
+Authorization: Bearer {{jwt_token}}
+
+###
+
+### Aflever en bog (USER only)
+PUT {{url}}/books/return/1
+Authorization: Bearer {{jwt_token}}
