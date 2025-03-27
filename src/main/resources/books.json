@@ -1,0 +1,229 @@
+{
+  "books": [
+    {
+      "title": "The Silent Garden",
+      "author": "Lena Foster",
+      "genre": "Fantasy",
+      "isAvailable": true,
+      "user": {
+        "username": "reader1"
+      }
+    },
+    {
+      "title": "Beneath Crimson Skies",
+      "author": "Owen Daniels",
+      "genre": "Thriller",
+      "isAvailable": false,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Shadows of the Forgotten",
+      "author": "Ivy Monroe",
+      "genre": "Mystery",
+      "isAvailable": true,
+      "user": {
+        "username": "reader1"
+      }
+    },
+    {
+      "title": "Winds of the West",
+      "author": "Miles Carpenter",
+      "genre": "Historical",
+      "isAvailable": false,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Dreams of Dust",
+      "author": "Ella Snow",
+      "genre": "Science Fiction",
+      "isAvailable": true,
+      "user": {
+        "username": "reader1"
+      }
+    },
+    {
+      "title": "Labyrinth of Echoes",
+      "author": "Henry Lowell",
+      "genre": "Mystery",
+      "isAvailable": false,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "The Forgotten Path",
+      "author": "Clara Dean",
+      "genre": "Fantasy",
+      "isAvailable": true,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Tides of Tomorrow",
+      "author": "Samuel Grant",
+      "genre": "Science Fiction",
+      "isAvailable": false,
+      "user": {
+        "username": "reader1"
+      }
+    },
+    {
+      "title": "Voices from Below",
+      "author": "Harper Vance",
+      "genre": "Horror",
+      "isAvailable": true,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Ashes in the Wind",
+      "author": "Noah Grayson",
+      "genre": "Historical",
+      "isAvailable": true,
+      "user": {
+        "username": "reader1"
+      }
+    },
+    {
+      "title": "The Time Weaver",
+      "author": "Sophie Ellis",
+      "genre": "Science Fiction",
+      "isAvailable": false,
+      "user": {
+        "username": "reader1"
+      }
+    },
+    {
+      "title": "Rising from Silence",
+      "author": "Julian West",
+      "genre": "Non-fiction",
+      "isAvailable": true,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Frost and Flame",
+      "author": "Bella Knight",
+      "genre": "Romance",
+      "isAvailable": true,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Veil of Secrets",
+      "author": "Lucas Blake",
+      "genre": "Mystery",
+      "isAvailable": false,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Serpent’s Game",
+      "author": "Vivian Rhodes",
+      "genre": "Thriller",
+      "isAvailable": true,
+      "user": {
+        "username": "reader1"
+      }
+    },
+    {
+      "title": "Chasing the Dawn",
+      "author": "Elijah Moore",
+      "genre": "Romance",
+      "isAvailable": false,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Crimson Mirage",
+      "author": "Isla Ray",
+      "genre": "Fantasy",
+      "isAvailable": true,
+      "user": {
+        "username": "reader1"
+      }
+    },
+    {
+      "title": "Bitter Moonlight",
+      "author": "Max Holloway",
+      "genre": "Horror",
+      "isAvailable": true,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Echoes of Fire",
+      "author": "Nina Hart",
+      "genre": "Fantasy",
+      "isAvailable": false,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "The Clockmaker’s Curse",
+      "author": "Ethan Wren",
+      "genre": "Mystery",
+      "isAvailable": true,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Glass Wings",
+      "author": "Ava Bennett",
+      "genre": "Romance",
+      "isAvailable": true,
+      "user": {
+        "username": "reader1"
+      }
+    },
+    {
+      "title": "Dusk over the Valley",
+      "author": "Liam Cross",
+      "genre": "Historical",
+      "isAvailable": false,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Blackwater Falls",
+      "author": "Scarlett Day",
+      "genre": "Thriller",
+      "isAvailable": true,
+      "user": {
+        "username": "reader1"
+      }
+    },
+    {
+      "title": "Hollow Eyes",
+      "author": "Jasper North",
+      "genre": "Horror",
+      "isAvailable": true,
+      "user": {
+        "username": "reader2"
+      }
+    },
+    {
+      "title": "Lanterns of Hope",
+      "author": "Grace Dalton",
+      "genre": "Non-fiction",
+      "isAvailable": false,
+      "user": {
+        "username": "reader1"
+      }
+    }
+  ]
+}

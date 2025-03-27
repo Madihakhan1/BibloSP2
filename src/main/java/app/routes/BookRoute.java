@@ -9,8 +9,10 @@ import static io.javalin.apibuilder.ApiBuilder.*;
 public class BookRoute {
     private final BookController bookController = new BookController();
 
+
     protected EndpointGroup getRoutes() {
         return () -> {
+            // Fjernet ekstra "/books" her
             put("/{id}", bookController::update, Role.ADMIN);
             post("/populate", bookController::populate, Role.ADMIN);
             post("/", bookController::create, Role.ADMIN);
@@ -18,10 +20,6 @@ public class BookRoute {
             get("/mine", bookController::readAllFromUser, Role.USER);
             get("/{id}", bookController::read, Role.USER);
             delete("/{id}", bookController::delete, Role.ADMIN);
-         /*   put("/borrow/{id}", bookController::borrow, Role.USER);
-            put("/return/{id}", bookController::returnBook, Role.USER);
-
-          */
         };
     }
 }

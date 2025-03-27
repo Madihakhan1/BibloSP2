@@ -11,27 +11,53 @@ public class SecurityPopulatorDAO {
     private static EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
 
     public static UserDTO[] populateUsers(EntityManagerFactory emf) {
-        User user, admin;
-        Role userRole, adminRole;
-
-        user = new User("usertest", "user123");
-        admin = new User("admintest", "admin123");
-        userRole = new Role("USER");
-        adminRole = new Role("ADMIN");
-        user.addRole(userRole);
-        admin.addRole(adminRole);
-
-        try (var em = emf.createEntityManager())
-        {
+        try (var em = emf.createEntityManager()) {
             em.getTransaction().begin();
-            em.persist(userRole);
-            em.persist(adminRole);
-            em.persist(user);
-            em.persist(admin);
+
+            // Roller
+            Role userRole = em.find(Role.class, "USER");
+            if (userRole == null) {
+                userRole = new Role("USER");
+                em.persist(userRole);
+            }
+
+            Role adminRole = em.find(Role.class, "ADMIN");
+            if (adminRole == null) {
+                adminRole = new Role("ADMIN");
+                em.persist(adminRole);
+            }
+
+            // Brugere
+            User reader1 = em.find(User.class, "reader1");
+            if (reader1 == null) {
+                reader1 = new User("reader1", "user123");
+                reader1.addRole(userRole);
+                em.persist(reader1);
+            }
+
+            User reader2 = em.find(User.class, "reader2");
+            if (reader2 == null) {
+                reader2 = new User("reader2", "user124");
+                reader2.addRole(userRole);
+                em.persist(reader2);
+            }
+
+            User admin = em.find(User.class, "admintest");
+            if (admin == null) {
+                admin = new User("admintest", "admin123");
+                admin.addRole(adminRole);
+                em.persist(admin);
+            }
+
             em.getTransaction().commit();
+
+            return new UserDTO[]{
+                    new UserDTO(reader1.getUsername(), "user123"),
+                    new UserDTO(reader2.getUsername(), "user124"),
+                    new UserDTO(admin.getUsername(), "admin123")
+            };
         }
-        UserDTO userDTO = new UserDTO(user.getUsername(), "user123");
-        UserDTO adminDTO = new UserDTO(admin.getUsername(), "admin123");
-        return new UserDTO[]{userDTO, adminDTO};
     }
+
+
 }
