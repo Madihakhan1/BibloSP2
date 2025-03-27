@@ -2,14 +2,21 @@ package app.daos.impl;
 
 import app.daos.IDAO;
 import app.dtos.BookDTO;
+import app.dtos.BookListDTO;
 import app.entities.Book;
 import app.exceptions.ApiException;
 import app.security.daos.SecurityPopulatorDAO;
+import app.security.entities.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.bugelhartmann.UserDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookDAO implements IDAO<BookDTO, Integer> {
@@ -67,14 +74,30 @@ public class BookDAO implements IDAO<BookDTO, Integer> {
     public BookDTO create(BookDTO bookDTO) throws ApiException {
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
+
             Book book = new Book(bookDTO);
+
+            // Find eksisterende bruger i databasen
+            if (bookDTO.getUser() != null && bookDTO.getUser().getUsername() != null) {
+                String username = bookDTO.getUser().getUsername();
+                app.security.entities.User user = em.find(app.security.entities.User.class, username);
+                if (user == null) {
+                    throw new ApiException(404, "User not found: " + username);
+                }
+                book.setUser(user);
+            }
+
             em.persist(book);
             em.getTransaction().commit();
             return new BookDTO(book);
+        } catch (ApiException e) {
+            throw e;
         } catch (Exception e) {
+            e.printStackTrace(); // for fejlsøgning
             throw new ApiException(400, "Something went wrong during create");
         }
     }
+
 
     @Override
     public BookDTO update(Integer id, BookDTO bookDTO) throws ApiException {
@@ -115,30 +138,60 @@ public class BookDAO implements IDAO<BookDTO, Integer> {
     }
 
     public BookDTO[] populate() throws ApiException {
-        UserDTO[] users = SecurityPopulatorDAO.populateUsers(emf);
-        UserDTO userDTO = users[0];
-        UserDTO adminDTO = users[1];
+        List<BookDTO> importedBooks;
 
-        BookDTO b1 = new BookDTO(null, "The Hobbit", "J.R.R. Tolkien", "Fantasy", true, userDTO);
-        BookDTO b2 = new BookDTO(null, "1984", "George Orwell", "Dystopia", true, userDTO);
-        BookDTO b3 = new BookDTO(null, "The Alchemist", "Paulo Coelho", "Philosophy", true, adminDTO);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            InputStream inputStream = BookDAO.class.getClassLoader().getResourceAsStream("books.json");
 
-        create(b1);
-        create(b2);
-        create(b3);
+            if (inputStream == null) {
+                throw new ApiException(500, "books.json not found in resources");
+            }
 
-        return new BookDTO[]{b1, b2, b3};
+            BookListDTO bookList = objectMapper.readValue(inputStream, BookListDTO.class);
+            importedBooks = bookList.getBooks();
+        } catch (IOException e) {
+            throw new ApiException(500, "Failed to read books from JSON file: " + e.getMessage());
+        }
+
+        List<BookDTO> createdBooks = new ArrayList<>();
+        for (BookDTO bookDTO : importedBooks) {
+            try (var em = emf.createEntityManager()) {
+                em.getTransaction().begin();
+
+                // Hent brugeren fra databasen, så den er managed
+                var user = em.find(app.security.entities.User.class, bookDTO.getUser().getUsername());
+                if (user == null) {
+                    throw new ApiException(404, "User not found: " + bookDTO.getUser().getUsername());
+                }
+
+                // Opret og forbind bogen til brugeren
+                Book book = new Book(bookDTO);
+                book.setUser(user);
+
+                em.persist(book);
+                em.getTransaction().commit();
+
+                createdBooks.add(new BookDTO(book));
+            }
+        }
+
+        return createdBooks.toArray(new BookDTO[0]);
     }
 
-    public List<UserDTO> readAllUsers() throws ApiException {
-        try (EntityManager em = emf.createEntityManager()) {
-            TypedQuery<UserDTO> query = em.createQuery(
-                    "SELECT new dk.bugelhartmann.UserDTO(u.username, u.password) FROM User u",
-                    UserDTO.class
-            );
-            return query.getResultList();
-        } catch (Exception e) {
-            throw new ApiException(400, "Something went wrong during readAllUsers");
+
+
+    public void saveBooks(List<Book> books) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            for (Book book : books) {
+                em.persist(book);
+            }
+            em.getTransaction().commit();
+        } finally {
+            em.close();
         }
     }
+
 }

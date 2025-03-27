@@ -4,90 +4,119 @@ import app.config.HibernateConfig;
 import app.controllers.IController;
 import app.daos.impl.BookDAO;
 import app.dtos.BookDTO;
-import app.exceptions.ApiException;
+import app.entities.Book;
+import app.dtos.BookListDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.bugelhartmann.UserDTO;
 import io.javalin.http.Context;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceException;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BookController implements IController<BookDTO, Integer> {
-    private final BookDAO dao;
 
-    public BookController() {
-        EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
-        this.dao = BookDAO.getInstance(emf);
+    private static final List<BookDTO> books = new ArrayList<>();
+
+    static {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            InputStream inputStream = BookController.class.getClassLoader().getResourceAsStream("books.json");
+            BookListDTO bookList = objectMapper.readValue(inputStream, BookListDTO.class);
+            books.addAll(bookList.getBooks());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Failed to load books from JSON file.");
+        }
     }
 
+
     @Override
-    public void read(Context ctx) throws ApiException {
-        try {
-            int id = Integer.parseInt(ctx.pathParam("id"));
-            BookDTO bookDTO = dao.read(id);
-            ctx.res().setStatus(200);
-            ctx.json(bookDTO, BookDTO.class);
-        } catch (NumberFormatException e) {
-            throw new ApiException(400, "Missing or invalid ID parameter");
+    public void read(Context ctx) {
+        int id = Integer.parseInt(ctx.pathParam("id"));
+        BookDTO book = books.stream()
+                .filter(b -> b.getId() == id)
+                .findFirst()
+                .orElse(null);
+
+        if (book == null) {
+            ctx.status(404).result("Book not found");
+        } else {
+            ctx.status(200).json(book);
         }
     }
 
     @Override
-    public void readAll(Context ctx) throws ApiException {
-        List<BookDTO> bookDTOS = dao.readAll();
-        ctx.res().setStatus(200);
-        ctx.json(bookDTOS, BookDTO.class);
+    public void readAll(Context ctx) {
+        ctx.status(200).json(books);
     }
 
-    public void readAllFromUser(Context ctx) throws ApiException {
+    public void readAllFromUser(Context ctx) {
         UserDTO user = ctx.attribute("user");
-        List<BookDTO> bookDTOS = dao.readAllFromUser(user);
-        ctx.res().setStatus(200);
-        ctx.json(bookDTOS, BookDTO.class);
+
+        List<BookDTO> userBooks = books.stream()
+                .filter(b -> b.getUser() != null && b.getUser().getUsername().equals(user.getUsername()))
+                .collect(Collectors.toList());
+
+        ctx.status(200).json(userBooks);
     }
 
     @Override
-    public void create(Context ctx) throws ApiException {
-        BookDTO bookDTO = ctx.bodyAsClass(BookDTO.class);
-        UserDTO user = ctx.attribute("user");
-        bookDTO.setUser(user);
-        bookDTO = dao.create(bookDTO);
-        ctx.res().setStatus(201);
-        ctx.json(bookDTO, BookDTO.class);
+    public void create(Context ctx) {
+        BookDTO newBook = ctx.bodyAsClass(BookDTO.class);
+        books.add(newBook);
+        ctx.status(201).json(newBook);
     }
 
     @Override
-    public void update(Context ctx) throws ApiException {
-        try {
-            int id = Integer.parseInt(ctx.pathParam("id"));
-            BookDTO updatedDTO = ctx.bodyAsClass(BookDTO.class);
-            BookDTO resultDTO = dao.update(id, updatedDTO);
-            ctx.res().setStatus(200);
-            ctx.json(resultDTO, BookDTO.class);
-        } catch (NumberFormatException e) {
-            throw new ApiException(400, "Missing or invalid ID parameter");
+    public void update(Context ctx) {
+        int id = Integer.parseInt(ctx.pathParam("id"));
+        BookDTO updatedBook = ctx.bodyAsClass(BookDTO.class);
+
+        for (int i = 0; i < books.size(); i++) {
+            if (books.get(i).getId() == id) {
+                books.set(i, updatedBook);
+                ctx.status(200).json(updatedBook);
+                return;
+            }
         }
+        ctx.status(404).result("Book not found");
     }
 
     @Override
-    public void delete(Context ctx) throws ApiException {
-        try {
-            UserDTO userDTO = ctx.attribute("user");
-            int id = Integer.parseInt(ctx.pathParam("id"));
-            dao.delete(id, userDTO);
-            ctx.res().setStatus(204);
-        } catch (NumberFormatException e) {
-            throw new ApiException(400, "Missing or invalid ID parameter");
+    public void delete(Context ctx) {
+        int id = Integer.parseInt(ctx.pathParam("id"));
+        boolean removed = books.removeIf(b -> b.getId() == id);
+
+        if (removed) {
+            ctx.status(204);
+        } else {
+            ctx.status(404).result("Book not found");
         }
     }
 
-    public void populate(Context ctx) throws ApiException {
+    public void saveBooksToDatabase(EntityManagerFactory emf) {
+        List<Book> booksToSave = books.stream()
+                .map(BookDTO::getAsEntity)
+                .collect(Collectors.toList());
+
+        BookDAO bookDAO = BookDAO.getInstance(emf);
+        bookDAO.saveBooks(booksToSave);
+    }
+
+
+    public void populate(Context ctx) {
         try {
-            BookDTO[] bookDTOS = dao.populate();
-            ctx.res().setStatus(200);
-            ctx.json("{ \"message\": \"Database has been populated with books\" }");
-        } catch (PersistenceException e) {
-            throw new ApiException(400, "Populator failed");
+            EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+            saveBooksToDatabase(emf);
+            ctx.status(200).json("{\"message\": \"Books from JSON saved to database\"}");
+        } catch (Exception e) {
+            ctx.status(500).json("{\"error\": \"Failed to populate books to database\"}");
         }
     }
+
 }
