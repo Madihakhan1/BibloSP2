@@ -43,6 +43,9 @@ public class Book {
         }
     }
 
+    public Book(String book, String book1) {
+    }
+
     public void removeUser() {
         if (this.user != null) {
             this.user.getBooks().remove(this);

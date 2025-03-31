@@ -37,6 +37,13 @@ public class BookDTO {
         }
     }
 
+    public BookDTO(int id, String title, String author) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+    }
+
+
     // Convert DTO to entity
     @JsonIgnore
     public Book getAsEntity() {
